@@ -6,7 +6,6 @@ import { urlencoded } from "body-parser";
 import dogsRouter from "./src/routes/dogs/dogs.route";
 import pingRouter from "./src/routes/ping/ping.route";
 import connection from "./src/config/db.config";
-import { error } from "console";
 dotenv.config();
 
 const app: Express = express();
