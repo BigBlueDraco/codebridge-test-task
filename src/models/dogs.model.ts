@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import { Table, Model, Column, DataType } from "sequelize-typescript";
 
 @Table({
@@ -14,18 +13,18 @@ export class Dogs extends Model {
   name!: string;
   @Column({
     type: DataType.STRING,
-    allowNull: false,
     unique: true,
   })
   color!: string;
   @Column({
-    type: DataType.NUMBER,
-    allowNull: false,
+    type: DataType.FLOAT,
+    allowNull: true,
   })
-  tail_length!: string;
+  tail_length!: number;
+
   @Column({
-    type: DataType.NUMBER,
-    allowNull: false,
+    type: DataType.FLOAT,
+    allowNull: true,
   })
   weight!: number;
 }
