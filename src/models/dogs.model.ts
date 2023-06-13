@@ -13,18 +13,18 @@ export class Dogs extends Model {
   name!: string;
   @Column({
     type: DataType.STRING,
-    unique: true,
+    allowNull: false,
   })
   color!: string;
   @Column({
     type: DataType.FLOAT,
-    allowNull: true,
+    allowNull: false,
   })
   tail_length!: number;
 
   @Column({
     type: DataType.FLOAT,
-    allowNull: true,
+    allowNull: false,
   })
   weight!: number;
 }

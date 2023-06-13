@@ -9,20 +9,18 @@ export interface IDogsController {
 }
 import { Dogs } from "../../models/dogs.model";
 
-function first() {
-  console.log("first(): factory evaluated");
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    console.log("first(): called");
-  };
-}
 export default class DogsController implements IDogsController {
-  private handleError(res: Response, statusCode: number): void {
-    console.error();
-    res.status(statusCode).json();
+  private handleError(res: Response, statusCode: number, err: any): void {
+    console.error(err);
+    res.status(statusCode).json({ message: err });
+  }
+  private async checkDogExists(id: string, res: Response): Promise<void> {
+    try {
+      const dog = await Dogs.findByPk(id);
+      if (!dog) {
+        res.status(404).json({ message: "dog doesn't exist" });
+      }
+    } catch (err) {}
   }
 
   async getAll(req: Request, res: Response): Promise<void> {
@@ -30,48 +28,51 @@ export default class DogsController implements IDogsController {
       const dogs: Dogs[] = await Dogs.findAll();
       res.status(200).json(dogs);
     } catch (err) {
-      console.log(err);
-      res.status(500).json({ message: err });
+      this.handleError(res, 500, err);
     }
   }
+
   async getOne(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const dog: Dogs | null = await Dogs.findOne({ where: { id } });
       res.status(200).json(dog);
-    } catch (e) {}
+    } catch (err) {
+      this.handleError(res, 500, err);
+    }
   }
   async create(req: Request, res: Response): Promise<void> {
     const { name, ...defaults } = req.body;
     try {
       const [dog, isCreated] = await Dogs.findOrCreate({
-        where: { name: req.body.name },
-        defaults: defaults,
+        where: { name: name },
+        defaults: { ...defaults },
       });
+
       if (!isCreated) {
-        res.status(409).json({ message: "dog name alredy exist" });
+        res.status(409).json({ message: "dog's name alredy exist" });
       }
       res.status(201).json(dog);
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
   }
   async delete(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const dog: Dogs | null = await Dogs.findOne({ where: { id } });
-      if (!dog) {
-        res.status(404).json({ message: "dog doesn't exist" });
-      }
+      this.checkDogExists(id, res);
+
       await Dogs.destroy({ where: { id } });
       res.status(204).json({ id: id });
-    } catch (e) {}
+    } catch (err) {
+      this.handleError(res, 500, err);
+    }
   }
   async update(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
     try {
-      const dog: Dogs | null = await Dogs.findOne({ where: { id } });
-      if (!dog) {
-        res.status(404).json({ message: "dog doesn't exist" });
-      }
+      const { id } = req.params;
+      this.checkDogExists(id, res);
+
       await Dogs.update(
         { ...req.body },
         {
@@ -82,6 +83,8 @@ export default class DogsController implements IDogsController {
       );
       const updatedDog: Dogs | null = await Dogs.findOne({ where: { id } });
       res.status(200).json(updatedDog);
-    } catch (e) {}
+    } catch (err) {
+      this.handleError(res, 500, err);
+    }
   }
 }

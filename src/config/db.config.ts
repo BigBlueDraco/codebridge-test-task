@@ -17,6 +17,7 @@ const connection = new Sequelize({
   database: DB,
   dialect: "mysql",
   models: [Dogs],
+  logging: false,
 });
 
 export default connection;
