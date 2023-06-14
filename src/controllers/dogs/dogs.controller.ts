@@ -93,20 +93,20 @@ export default class DogsController implements IDogsController {
   async getAll(req: Request, res: Response): Promise<void> {
     try {
       const { attribute = "id", order = "ASC" } = req.query;
-      const { limit = 10, offset = 1 } = req.query;
+      const { pageSize = 10, pageNumber = 1 } = req.query;
       const amount = await Dogs.count();
 
       const dogs: Dogs[] = await Dogs.findAll({
-        limit: +limit,
-        offset: +offset,
+        limit: +pageSize,
+        offset: +pageNumber,
         order: [[`${attribute}`, `${order}`]],
       });
 
       const pagination = {
         totalItems: amount,
         itemCount: dogs.length,
-        totalPages: Math.round(amount / +limit),
-        currentPage: +offset,
+        totalPages: Math.round(amount / +pageSize),
+        currentPage: +pageNumber,
       };
       res.status(200).json({
         dogs: dogs,
