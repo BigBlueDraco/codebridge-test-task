@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import Joi, { any } from "joi";
+import Joi from "joi";
 import { Dogs } from "../../models/dogs.model";
 
 export interface IDogsController {
