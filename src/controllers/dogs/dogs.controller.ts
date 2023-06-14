@@ -177,6 +177,13 @@ export default class DogsController implements IDogsController {
   async update(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const exitingDogWithName = await Dogs.findOne({
+        where: { name: req.body.name },
+      });
+      if (exitingDogWithName) {
+        res.status(409).json({ message: "dog's name alredy exist" }).end();
+        return;
+      }
       await Dogs.update(
         { ...req.body },
         {
